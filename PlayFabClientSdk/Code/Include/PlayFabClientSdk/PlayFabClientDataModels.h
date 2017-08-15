@@ -4113,7 +4113,8 @@ namespace PlayFabClientSdk
             OptionalInt32 MaxPlayers;
             std::list<AZStd::string> PlayerUserIds;
             Uint32 RunTime;
-            Boxed<GameInstanceState> GameServerState;
+            OptionalInt32 GameServerState;
+            Boxed<GameInstanceState> GameServerStateEnum;
             AZStd::string GameServerData;
             std::map<AZStd::string, AZStd::string> Tags;
             OptionalTime LastHeartbeat;
@@ -4131,6 +4132,7 @@ namespace PlayFabClientSdk
                 PlayerUserIds(),
                 RunTime(0),
                 GameServerState(),
+                GameServerStateEnum(),
                 GameServerData(),
                 Tags(),
                 LastHeartbeat(),
@@ -4149,6 +4151,7 @@ namespace PlayFabClientSdk
                 PlayerUserIds(src.PlayerUserIds),
                 RunTime(src.RunTime),
                 GameServerState(src.GameServerState),
+                GameServerStateEnum(src.GameServerStateEnum),
                 GameServerData(src.GameServerData),
                 Tags(src.Tags),
                 LastHeartbeat(src.LastHeartbeat),
@@ -4204,7 +4207,11 @@ namespace PlayFabClientSdk
                 writer.Uint(RunTime);
                 if (GameServerState.notNull()) {
                     writer.String("GameServerState");
-                    writeGameInstanceStateEnumJSON(GameServerState, writer);
+                    writer.Int(GameServerState);
+                }
+                if (GameServerStateEnum.notNull()) {
+                    writer.String("GameServerStateEnum");
+                    writeGameInstanceStateEnumJSON(GameServerStateEnum, writer);
                 }
                 if (GameServerData.length() > 0) {
                     writer.String("GameServerData");
@@ -4258,7 +4265,9 @@ namespace PlayFabClientSdk
                 const Value::ConstMemberIterator RunTime_member = obj.FindMember("RunTime");
                 if (RunTime_member != obj.MemberEnd() && !RunTime_member->value.IsNull()) RunTime = RunTime_member->value.GetUint();
                 const Value::ConstMemberIterator GameServerState_member = obj.FindMember("GameServerState");
-                if (GameServerState_member != obj.MemberEnd() && !GameServerState_member->value.IsNull()) GameServerState = readGameInstanceStateFromValue(GameServerState_member->value);
+                if (GameServerState_member != obj.MemberEnd() && !GameServerState_member->value.IsNull()) GameServerState = GameServerState_member->value.GetInt();
+                const Value::ConstMemberIterator GameServerStateEnum_member = obj.FindMember("GameServerStateEnum");
+                if (GameServerStateEnum_member != obj.MemberEnd() && !GameServerStateEnum_member->value.IsNull()) GameServerStateEnum = readGameInstanceStateFromValue(GameServerStateEnum_member->value);
                 const Value::ConstMemberIterator GameServerData_member = obj.FindMember("GameServerData");
                 if (GameServerData_member != obj.MemberEnd() && !GameServerData_member->value.IsNull()) GameServerData = GameServerData_member->value.GetString();
                 const Value::ConstMemberIterator Tags_member = obj.FindMember("Tags");

@@ -14809,13 +14809,15 @@ namespace PlayFabServerSdk
             AZStd::string Message;
             PushNotificationPackage* Package;
             AZStd::string Subject;
+            std::list<PushNotificationPlatform> TargetPlatforms;
 
             SendPushNotificationRequest() :
                 PlayFabBaseModel(),
                 Recipient(),
                 Message(),
                 Package(nullptr),
-                Subject()
+                Subject(),
+                TargetPlatforms()
             {}
 
             SendPushNotificationRequest(const SendPushNotificationRequest& src) :
@@ -14823,7 +14825,8 @@ namespace PlayFabServerSdk
                 Recipient(src.Recipient),
                 Message(src.Message),
                 Package(src.Package ? new PushNotificationPackage(*src.Package) : nullptr),
-                Subject(src.Subject)
+                Subject(src.Subject),
+                TargetPlatforms(src.TargetPlatforms)
             {}
 
             SendPushNotificationRequest(const rapidjson::Value& obj) : SendPushNotificationRequest()
@@ -14853,6 +14856,14 @@ namespace PlayFabServerSdk
                     writer.String("Subject");
                     writer.String(Subject.c_str());
                 }
+                if (!TargetPlatforms.empty()) {
+                    writer.String("TargetPlatforms");
+                    writer.StartArray();
+                    for (std::list<PushNotificationPlatform>::iterator iter = TargetPlatforms.begin(); iter != TargetPlatforms.end(); iter++) {
+                        writePushNotificationPlatformEnumJSON(*iter, writer);
+                    }
+                    writer.EndArray();
+                }
                 writer.EndObject();
             }
 
@@ -14866,6 +14877,13 @@ namespace PlayFabServerSdk
                 if (Package_member != obj.MemberEnd() && !Package_member->value.IsNull()) Package = new PushNotificationPackage(Package_member->value);
                 const Value::ConstMemberIterator Subject_member = obj.FindMember("Subject");
                 if (Subject_member != obj.MemberEnd() && !Subject_member->value.IsNull()) Subject = Subject_member->value.GetString();
+                const Value::ConstMemberIterator TargetPlatforms_member = obj.FindMember("TargetPlatforms");
+                if (TargetPlatforms_member != obj.MemberEnd()) {
+                    const rapidjson::Value& memberList = TargetPlatforms_member->value;
+                    for (SizeType i = 0; i < memberList.Size(); i++) {
+                        TargetPlatforms.push_back(readPushNotificationPlatformFromValue(memberList[i]));
+                    }
+                }
 
                 return true;
             }
